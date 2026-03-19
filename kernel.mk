@@ -8,21 +8,10 @@ KERNEL_VERSION=v5.10.246
 KERNEL_SRC_DIR=${BUILD_DIR}/kernel-src-${KERNEL_VERSION}
 KERNEL_BUILD_DIR=${BUILD_DIR}/kernel-build
 KERNEL_IMAGE_PATH=${KERNEL_BUILD_DIR}/arch/arm64/boot/Image
-KERNEL_FIT_PATH=${KERNEL_BUILD_DIR}/epos_kernel.fit
 KERNEL_VENDOR_FIT_PATH=${KERNEL_BUILD_DIR}/epos_vendor_kernel.fit
 KERNEL_ITS_PATH=${THIS_MAKEFILE_DIR}/epos_kernel.its
-KERNEL_VENDOR_ITS_PATH=${THIS_MAKEFILE_DIR}/vendor.its
-KERNEL_INITRAMFS_PATH=${KERNEL_BUILD_DIR}/initramfs.img
 
 all: ${KERNEL_IMAGE_PATH}
-
-MAINLINE_PARTITIONS_DIR=${BUILD_DIR}/partitions/mainline
-MAINLINE_BOOT_IMG_PATH=${MAINLINE_PARTITIONS_DIR}/boot.img
-RESOURCE_IMG_PATH=${MAINLINE_PARTITIONS_DIR}/resource.img
-ITS_FILE_PATH=${MAINLINE_PARTITIONS_DIR}/boot.its
-
-EPOS_LOGO_FILE_PATH=${THIS_MAKEFILE_DIR}/epos_logo.bmp
-
 
 # download kernel source
 ${KERNEL_SRC_DIR}/Makefile:
@@ -35,12 +24,14 @@ ${KERNEL_SRC_DIR}/Makefile:
 	ln -s ${THIS_MAKEFILE_DIR}/resources/ec942_defconfig ${KERNEL_SRC_DIR}/arch/arm64/configs/ec942_defconfig
 	ln -s ${THIS_MAKEFILE_DIR}/resources/vendor.its ${KERNEL_BUILD_DIR}/vendor.its
 	# add to the Makefile dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-ec942.dtb
+	echo "dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-ec942.dtb" >> ${KERNEL_SRC_DIR}/arch/arm64/Makefile
+	rm -fr ${BUILD_DIR}/${KERNEL_VERSION}.tar.gz
 
 ${KERNEL_IMAGE_PATH}: ${KERNEL_SRC_DIR}/Makefile
 	mkdir -p ${KERNEL_BUILD_DIR}
 	make -C ${KERNEL_SRC_DIR} -j12 CROSS_COMPILE=aarch64-unknown-linux-gnu- ARCH=arm64 O=${KERNEL_BUILD_DIR} ec942_defconfig all
 
-${KERNEL_VENDOR_FIT_PATH}: ${KERNEL_ITS_PATH} ${KERNEL_IMAGE_PATH}
+${KERNEL_VENDOR_FIT_PATH}: ${KERNEL_IMAGE_PATH}
 	cd ${KERNEL_BUILD_DIR} && ${THIS_MAKEFILE_DIR}/resources/mkimage -f vendor.its -E -p 0x800 $@
 
 clean:
