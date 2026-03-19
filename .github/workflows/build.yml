@@ -25,7 +25,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build
-          bash ./build.sh 2>&1 | tee build/ci-build.log
+          make all 2>&1 | tee build/ci-build.log
 
       - name: Upload build artifacts
         if: always()

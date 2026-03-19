@@ -32,8 +32,8 @@ ${KERNEL_SRC_DIR}/Makefile:
 	tar -xzf ${BUILD_DIR}/${KERNEL_VERSION}.tar.gz -C ${KERNEL_SRC_DIR} --strip-components=1
 	# add dts for EC942
 	ln -s ${THIS_MAKEFILE_DIR}/resources/rk3568-ec942.dts ${KERNEL_SRC_DIR}/arch/arm64/boot/dts/rockchip/rk3568-ec942.dts
-	ln -s ${THIS_MAKEFILE_DIR}/resources/ec942_defconfig ${KERNEL_BUILD_DIR}/vendor.its
-	ln -s
+	ln -s ${THIS_MAKEFILE_DIR}/resources/ec942_defconfig ${KERNEL_SRC_DIR}/arch/arm64/configs/ec942_defconfig
+	ln -s ${THIS_MAKEFILE_DIR}/resources/vendor.its ${KERNEL_BUILD_DIR}/vendor.its
 	# add to the Makefile dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-ec942.dtb
 
 ${KERNEL_IMAGE_PATH}: ${KERNEL_SRC_DIR}/Makefile
@@ -41,7 +41,7 @@ ${KERNEL_IMAGE_PATH}: ${KERNEL_SRC_DIR}/Makefile
 	make -C ${KERNEL_SRC_DIR} -j12 CROSS_COMPILE=aarch64-unknown-linux-gnu- ARCH=arm64 O=${KERNEL_BUILD_DIR} ec942_defconfig all
 
 ${KERNEL_VENDOR_FIT_PATH}: ${KERNEL_ITS_PATH} ${KERNEL_IMAGE_PATH}
-	cd ${KERNEL_BUILD_DIR} && ${EPOS_RESOURCES_DIR}/inhand_resources/switch/mkimage -f vendor.its -E -p 0x800 $@
+	cd ${KERNEL_BUILD_DIR} && ${THIS_MAKEFILE_DIR}/resources/mkimage -f vendor.its -E -p 0x800 $@
 
 clean:
 	rm -rf ${BUILD_DIR}
