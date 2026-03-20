@@ -1,6 +1,6 @@
 ####### VARIABLES FOR MEETING 20.03.2026
 KERNEL_VERSION=v5.10
-
+########################################
 
 
 THIS_MAKEFILE_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))

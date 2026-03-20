@@ -2,7 +2,8 @@
 MAINLINE_UBOOT_VERSION=2026.01-rc2
 MAINLINE_UBOOT_DEFCONFIG = evb-rk3568_defconfig
 TRUSTED_FIRMWARE_A_B31 = ${RKBIN_SRC_DIR}/bin/rk35/rk3568_bl31_v1.45.elf
-OPTEE_BIN = ${RKBIN_SRC_DIR}/bin/rk35/rk3568_bl31_v1.45.elf
+# OPTEE_BIN = ${RKBIN_SRC_DIR}/bin/rk35/rk3568_tee_v2.10.bin does not exist ?
+########################################
 
 
 MAINLINE_UBOOT_SRC_DIR = ${BUILD_DIR}/mainline-u-boot-src-${MAINLINE_UBOOT_VERSION}
