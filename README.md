@@ -37,12 +37,13 @@ Our use case is to control industrial relay (Normally open). The current hardwar
 ## Answers 
 
 ### Answers within the meeeting:
-1, 2, 3, 4, 5, 6, 8, 9) No Mainline support. Only use SDK.
-7) No .dts provided, because of IP.
+- 1, 2, 3, 4, 5, 6, 8, 9 : No Mainline support. Only use SDK.
+- 7 : No .dts provided, because of IP.
 
-### Information waiting for the next meeting:
+### Information waiting for the next meeting of 20.03.2026:
 
 a) Information of *what exact* versions (commit) of u-boot and kernel are the starting point for the ones that are in the SDK
+
 b) Answers to the question 10) regarding digical IOs
  
 
