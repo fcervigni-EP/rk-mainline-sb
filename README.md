@@ -46,4 +46,6 @@ a) Information of *what exact* versions (commit) of u-boot and kernel are the st
 
 b) Answers to the question 10) regarding digical IOs
  
+# Meeting 27.03.2026
 
+.....
