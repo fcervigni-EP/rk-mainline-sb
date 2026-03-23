@@ -31,9 +31,10 @@ ${OE_ENV_FILE_PATH}:
 
 ${U_BOOT_DEFCONFIG_FILE_PATH}: ${OE_ENV_FILE_PATH}
 	@echo "Composing defconfig file as original ${U_BOOT_DEFCONFIG_FILE_PATH} plus append file ..."
-	cd $(U_BOOT_ROOT_DIR) && git checkout master
 	cat ${U_BOOT_ORIGINAL_DEFCONFIG_FILE_PATH} ${U_BOOT_DEFCONFIG_APPEND_FILE_PATH} > ${U_BOOT_DEFCONFIG_FILE_PATH}
-	git commit -am "Updated defconfig"
+	cd $(U_BOOT_ROOT_DIR) && git checkout master
+	cd $(U_BOOT_ROOT_DIR) && git add .
+	cd $(U_BOOT_ROOT_DIR) && git commit -am "Updated defconfig"
 	@echo "defconfig ends with ..."
 	tail -n 10 ${U_BOOT_DEFCONFIG_FILE_PATH}
 
