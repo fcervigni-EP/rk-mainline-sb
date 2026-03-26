@@ -11,6 +11,7 @@ PV = "2017.09"
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
 SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
            file://patches/uboot_secure_boot.patch \
+           file://patches/uboot_rkbin_activate_sign_flag.patch \
            "
 SRCREV = "${AUTOREV}"
 
@@ -53,8 +54,10 @@ do_configure:prepend() {
 	sed -i 's/ found;/ found = NULL;/' ${S}/lib/avb/libavb/avb_slot_verify.c
 
     # signing
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before configure"
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before configure, defconfig"
     tail "${S}/configs/rk3568_defconfig"
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before configure, setting.ini"
+    tail "${S}/rkbin/tools/setting.ini"
     echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK"
 }
 
