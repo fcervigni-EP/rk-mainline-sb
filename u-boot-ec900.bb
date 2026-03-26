@@ -12,6 +12,7 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
 SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
            file://patches/uboot_secure_boot.patch \
            file://patches/uboot_rkbin_activate_sign_flag.patch \
+           file://keys \
            "
 SRCREV = "${AUTOREV}"
 
@@ -19,11 +20,22 @@ SRCREV = "${AUTOREV}"
 RK_LOADER_BIN = "loader.bin"
 UBOOT_BINARY = "uboot.img"
 KERNEL_BINARY = "boot.img"
+KERNEL_BINARY_ABS_PATH="${DEPLOY_DIR_IMAGE}/${KERNEL_BINARY}"
+TRUST_BINARY = "trust.img"
+RECOVERY_BINARY = "recovery.img"
+KERNEL_IMG="${DEPLOY_DIR_IMAGE}/Image-${MACHINE}.bin"
+RAMDISK_IMG=""
+KERNEL_DTB="${DEPLOY_DIR_IMAGE}/rk3568-${MACHINE}.dtb"
+RESOURCE_IMG="${DEPLOY_DIR_IMAGE}/resource.img"
 
 DEPENDS:append = " ${PYTHON_PN}-native"
 
 # Needed for packing BSP u-boot
 DEPENDS:append = " coreutils-native ${PYTHON_PN}-pyelftools-native util-linux-native"
+
+do_compile:prepend() {
+    cp -r ${WORKDIR}/keys ${B}/keys
+}
 
 do_configure:prepend() {
 	# Make sure we use /usr/bin/env ${PYTHON_PN} for scripts
@@ -68,6 +80,7 @@ do_compile:append() {
 	if [ -e "${B}/prebuilt/${UBOOT_BINARY}" ]; then
 		bbnote "${PN}: Using prebuilt images."
 		ln -sf ${B}/prebuilt/*.bin ${B}/prebuilt/*.img ${B}/
+	    ln -sf *_loader*.bin "${RK_LOADER_BIN}"
 	else
 		# Prepare needed files
 		for d in make.sh scripts configs arch/arm/mach-rockchip rkbin; do
@@ -75,11 +88,23 @@ do_compile:append() {
 			cp -rT ${S}/${d} ${d}
 		done
 
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> before create fitimage"
+        create_fitimage
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> after create fitimage"
+        ls
 		# Pack rockchip loader images
-		./make.sh rk3568 --spl-new  --boot_img boot.img
+		# unused --recovery_img ${B}/${RECOVERY_BINARY}
+		./make.sh rk3568 --spl-new --boot_img ${KERNEL_BINARY_ABS_PATH} --burn-key-hash
+
+	    ln -sf *_loader*.bin "${RK_LOADER_BIN}"
+		${B}/rkbin/tools/rk_sign_tool cc --chip 3568
+		# Sign loader
+		${B}/rkbin/tools/rk_sign_tool sl --loader "${RK_LOADER_BIN}"
+        # Sign images
+        ${B}/rkbin/tools/rk_sign_tool si --img ${UBOOT_BINARY}
+        # ${B}/rkbin/tools/rk_sign_tool si --img ${DEPLOY_DIR_IMAGE}/${TRUST_BINARY}
 	fi
 
-	ln -sf *_loader*.bin "${RK_LOADER_BIN}"
 }
 
 do_deploy:append() {
@@ -92,7 +117,7 @@ do_deploy:append() {
 	done
 }
 
-do_fitimage() {
+create_fitimage() {
 	cd ${B}
 
 	TARGET_IMG="${DEPLOY_DIR_IMAGE}/${KERNEL_BINARY}"
@@ -117,13 +142,7 @@ do_fitimage() {
 
 	rkbin/tools/mkimage -f "$TMP_ITS"  -E -p 0x800 "$TARGET_IMG"
 
-	# signing
-	echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Signing"
-	#./rk_sign_tool sf ......
-	
 	rm -f "$TMP_ITS"
 }
-do_fitimage[nostamp] = "1"
-do_fitimage[depends] += "linux-ec900:do_deploy"
 
-addtask do_fitimage after do_compile before do_install
+do_compile[depends] += "linux-ec900:do_deploy"
