@@ -20,13 +20,7 @@ SRCREV = "${AUTOREV}"
 RK_LOADER_BIN = "loader.bin"
 UBOOT_BINARY = "uboot.img"
 KERNEL_BINARY = "boot.img"
-KERNEL_BINARY_ABS_PATH="${DEPLOY_DIR_IMAGE}/${KERNEL_BINARY}"
 TRUST_BINARY = "trust.img"
-RECOVERY_BINARY = "recovery.img"
-KERNEL_IMG="${DEPLOY_DIR_IMAGE}/Image-${MACHINE}.bin"
-RAMDISK_IMG=""
-KERNEL_DTB="${DEPLOY_DIR_IMAGE}/rk3568-${MACHINE}.dtb"
-RESOURCE_IMG="${DEPLOY_DIR_IMAGE}/resource.img"
 
 DEPENDS:append = " ${PYTHON_PN}-native"
 
@@ -64,13 +58,6 @@ do_configure:prepend() {
 	[ ! -e "${S}/.config" ] || make -C ${S} mrproper
 
 	sed -i 's/ found;/ found = NULL;/' ${S}/lib/avb/libavb/avb_slot_verify.c
-
-    # signing
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before configure, defconfig"
-    tail "${S}/configs/rk3568_defconfig"
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before configure, setting.ini"
-    tail "${S}/rkbin/tools/setting.ini"
-    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK"
 }
 
 
@@ -88,19 +75,26 @@ do_compile:append() {
 			cp -rT ${S}/${d} ${d}
 		done
 
-        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> before create fitimage"
+        # Creating the kernel FIT image BEFORE the compilation of U-Boot, so we can sign it
         create_fitimage
-        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> after create fitimage"
-        ls
+
 		# Pack rockchip loader images
 		# unused --recovery_img ${B}/${RECOVERY_BINARY}
-		./make.sh rk3568 --spl-new --boot_img ${KERNEL_BINARY_ABS_PATH} --burn-key-hash
+		./make.sh rk3568 --spl-new --boot_img "${DEPLOY_DIR_IMAGE}/${KERNEL_BINARY}" --burn-key-hash
 
 	    ln -sf *_loader*.bin "${RK_LOADER_BIN}"
 		${B}/rkbin/tools/rk_sign_tool cc --chip 3568
 		# Sign loader
 		${B}/rkbin/tools/rk_sign_tool sl --loader "${RK_LOADER_BIN}"
         # Sign images
+        #
+        ######## ISSUE:
+        #********sign_tool ver 1.39********
+        #
+        # Image is uboot.img
+        # the image did not support to sign
+        #
+        #
         ${B}/rkbin/tools/rk_sign_tool si --img ${UBOOT_BINARY}
         # ${B}/rkbin/tools/rk_sign_tool si --img ${DEPLOY_DIR_IMAGE}/${TRUST_BINARY}
 	fi
