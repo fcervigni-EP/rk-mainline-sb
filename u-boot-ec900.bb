@@ -9,7 +9,9 @@ DEPENDS += " linux-ec900 bc-native dtc-native"
 PV = "2017.09"
 
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
-SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master;"
+SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
+           file://patches/uboot_secure_boot.patch \
+           "
 SRCREV = "${AUTOREV}"
 
 # Generate Rockchip style loader binaries
@@ -49,6 +51,11 @@ do_configure:prepend() {
 	[ ! -e "${S}/.config" ] || make -C ${S} mrproper
 
 	sed -i 's/ found;/ found = NULL;/' ${S}/lib/avb/libavb/avb_slot_verify.c
+
+    # signing
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before configure"
+    tail "${S}/configs/rk3568_defconfig"
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK"
 }
 
 
@@ -66,7 +73,7 @@ do_compile:append() {
 		done
 
 		# Pack rockchip loader images
-		./make.sh rk3568 --spl-new
+		./make.sh rk3568 --spl-new  --boot_img boot.img
 	fi
 
 	ln -sf *_loader*.bin "${RK_LOADER_BIN}"
@@ -106,6 +113,10 @@ do_fitimage() {
 		-e "s~@RESOURCE_IMG@~$(realpath -q "$RESOURCE_IMG")~" "$TMP_ITS"
 
 	rkbin/tools/mkimage -f "$TMP_ITS"  -E -p 0x800 "$TARGET_IMG"
+
+	# signing
+	echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Signing"
+	#./rk_sign_tool sf ......
 	
 	rm -f "$TMP_ITS"
 }

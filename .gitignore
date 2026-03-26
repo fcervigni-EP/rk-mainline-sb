@@ -2,6 +2,6 @@ build
 build_image/.built
 .idea
 *.gz
-files
+files/keys
 EC900-*
 SECURE_BOOT.md
