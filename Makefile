@@ -44,8 +44,11 @@ build-image: ${U_BOOT_DEFCONFIG_FILE_PATH}
 			--workdir ${YOCTO_ROOT_DIR} \
 			--rm \
 			-it crops/poky:latest \
-			bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c cleanall && bitbake u-boot-ec900"
+			bash -c "source ${OE_ENV_FILE_PATH} && bitbake ec900-image -c do_updateimg"
 
+# bitbake ec900-image -c do_updateimg"
+# bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c compile -f"
+# bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c cleanall && bitbake u-boot-ec900"
 
 clean:
 	$(MAKE) -C build_image clean

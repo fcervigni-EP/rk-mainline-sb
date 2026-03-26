@@ -2,3 +2,5 @@ build
 build_image/.built
 .idea
 *.gz
+keys
+EC900-*
