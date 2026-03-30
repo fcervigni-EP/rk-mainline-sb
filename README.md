@@ -58,4 +58,12 @@ b) Answers to the question 10) regarding digical IOs
  
 # Meeting 27.03.2026
 
-.....
+1) Created file u-boot-ec900.bb as a modification of original u-boot-ec900.bb. Blocked on signing uboot.img at this line:
+#********sign_tool ver 1.39********
+# Image is uboot.img
+# the image did not support to sign
+Are there any visible issues in our Yocto recipe ?
+
+2) waiting for further response from IO on reboot and eventual hardware revisions.
+
+ 
