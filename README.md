@@ -73,9 +73,9 @@ Created file u-boot-ec900.bb as a modification of original u-boot-ec900.bb. Bloc
 
 Are there any visible issues in our Yocto recipe ?
 
-# Meeting 05.03.2026
+# Next Meeting
  
-In response to the suggestions from **secure-boot-yocto-ec900.md** file: 
+#### In response to the suggestions from **secure-boot-yocto-ec900.md** file: 
 
 1. Enable **`CONFIG_FIT_SIGNATURE`**, **`CONFIG_SPL_FIT_SIGNATURE`**, etc. in **`rk3568_defconfig`** or a **fragment**.
 
@@ -98,7 +98,7 @@ As expressed in the notes secure-boot-yocto-ec900.md, it seems as the boot.its i
 Not very clear for this las tine, could I have sample code ? 
 
 
-_question_:
+#### _open questions_:
 
 a) The information regarding AVB, it should not regard us, correct ? Thank you in advance
 
@@ -109,4 +109,4 @@ b) How can we improve [our recipe](https://github.com/fcervigni-EP/rk-mainline-s
    # Image is uboot.img
    # the image did not support to sign
 ```
-**
+
