@@ -96,3 +96,17 @@ As expressed in the notes secure-boot-yocto-ec900.md, it seems as the boot.its i
 5. As needed, align **`RK3568TRUST.ini`**, **`ec900-image.bb`**, and **`tools/`** with partition policy.
 
 Not very clear for this las tine, could I have sample code ? 
+
+
+_question_:
+
+a) The information regarding AVB, it should not regard us, correct ? Thank you in advance
+
+b) How can we improve [our recipe](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/u-boot-ec900-original.bb) so not to be blocked on this line when signing uboot.img ?
+
+```shell
+   #********sign_tool ver 1.39********
+   # Image is uboot.img
+   # the image did not support to sign
+```
+**
