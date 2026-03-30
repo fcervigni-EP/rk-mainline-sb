@@ -58,12 +58,41 @@ b) Answers to the question 10) regarding digical IOs
  
 # Meeting 27.03.2026
 
-1) Created file u-boot-ec900.bb as a modification of original u-boot-ec900.bb. Blocked on signing uboot.img at this line:
-#********sign_tool ver 1.39********
-# Image is uboot.img
-# the image did not support to sign
+
+1. waiting for further response from IO on reboot and eventual hardware revisions.
+
+2. Blocked on building:
+
+Created file u-boot-ec900.bb as a modification of original u-boot-ec900.bb. Blocked on signing uboot.img at this line:
+
+```shell
+   #********sign_tool ver 1.39********
+   # Image is uboot.img
+   # the image did not support to sign
+```
+
 Are there any visible issues in our Yocto recipe ?
 
-2) waiting for further response from IO on reboot and eventual hardware revisions.
-
+# Meeting 05.03.2026
  
+In response to the suggestions from **secure-boot-yocto-ec900.md** file: 
+
+1. Enable **`CONFIG_FIT_SIGNATURE`**, **`CONFIG_SPL_FIT_SIGNATURE`**, etc. in **`rk3568_defconfig`** or a **fragment**.
+
+A: Done in [this patch](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/files/patches/uboot_secure_boot.patch) 
+
+2. Update **`u-boot-ec900.bb`**: wire **`fit.sh`** or an equivalent signing path in `do_compile`; use **`mkimage` with `-k`/`-K`** in **`do_fitimage`**.
+
+A: Done in [this line](https://github.com/fcervigni-EP/rk-mainline-sb/blob/cd26a1053e61f6ae0a3616fa9c952f157909e03c/u-boot-ec900.bb#L83), as when CONFIG_FIT_SIGNATURE is y and --burn-key-hash is activated, then in fit_core.sh the **-K** is used
+
+3. Supply **`u-boot/keys/dev.{key,pubkey,crt}`** (prefer **bbappend + SRC_URI** or a secrets directory; **do not commit private keys** to public repos).
+
+Done, there is a **non commited** /keys folder in side the [files folder, which is sym-linked in the recipe](https://github.com/fcervigni-EP/rk-mainline-sb/tree/main/files) which is then included [here](https://github.com/fcervigni-EP/rk-mainline-sb/blob/cd26a1053e61f6ae0a3616fa9c952f157909e03c/u-boot-ec900.bb#L15)
+
+4. Align **`kernel/boot.its`** with algorithm and key name.
+
+As expressed in the notes secure-boot-yocto-ec900.md, it seems as the boot.its is already defining the 'dev' key, isn't it ?
+
+5. As needed, align **`RK3568TRUST.ini`**, **`ec900-image.bb`**, and **`tools/`** with partition policy.
+
+Not very clear for this las tine, could I have sample code ? 
