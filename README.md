@@ -3,9 +3,15 @@
 ###### Build/clean
 
 ```shell
-# to build
+# copy here the SDK .tar.gz
+cp <your_location>/EC900-yocto-sdk-v1.0.1.tar.gz .
+# copy your keys folder into the files/ folder. it is a secret, do not commit it.
+cd -r <your_location>/keys/ files/
+
+# build
 make
-#to clean
+
+# clean
 make clean
 ```
 
