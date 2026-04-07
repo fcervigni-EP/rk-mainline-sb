@@ -120,6 +120,8 @@ b) How can we improve [our recipe](https://github.com/fcervigni-EP/rk-mainline-s
 
 We have received file `secureboot.md` on 04/07/2026.
 
+We have applied all suggestions, and the current state of this project represents the suggested modifications.
+
 Here is a summary of the suggestions and how they were applied.
 
 | File | Change | Where done                                                                                     |
@@ -131,9 +133,9 @@ Here is a summary of the suggestions and how they were applied.
 | `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added RSA key generation in `do_compile:append` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](u-boot-ec900.bb)                                            |
 | `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Changed `do_fitimage` to use `tools/mkimage` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](u-boot-ec900.bb)                                            |
 
-In [this file](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/validation_2026_04_07.txt) are:
+In [this file validation_2026_04_07.txt](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/validation_2026_04_07.txt) are:
 - the validation that the patches are correctly applied
-- the validation checks from the `secureboot.md` that we have received.
+- the validation checks from the `secureboot.md` that we have received. NOTE signatures are missing as of [here](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/validation_2026_04_07.txt#L118) 
 
 The current issues is:
 ```
