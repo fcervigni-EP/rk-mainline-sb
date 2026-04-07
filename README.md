@@ -122,16 +122,18 @@ We have received file `secureboot.md` on 04/07/2026.
 
 We have applied all suggestions, and the current state of this project represents the suggested modifications.
 
+The [recipe folder here](https://github.com/fcervigni-EP/rk-mainline-sb/tree/main/recipes-bsp) is used instead of the original one. (via symlink)
+
 Here is a summary of the suggestions and how they were applied.
 
 | File | Change | Where done                                                                                     |
 |------|--------|------------------------------------------------------------------------------------------------|
-| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_FIT_SIGNATURE=y` | [in patch uboot_secure_boot.patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch)   |
-| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_SPL_FIT_SIGNATURE=y` | [in patch uboot_secure_boot.patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch)   |
-| `yocto/u-boot/boot.its` | Added `required = "conf";` | [in patch uboot_its_required.patch](recipes-bsp/u-boot/files/patches/uboot_its_required.patch) |
-| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added `openssl-native` to `DEPENDS` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](u-boot-ec900.bb)                               |
-| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added RSA key generation in `do_compile:append` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](u-boot-ec900.bb)                                            |
-| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Changed `do_fitimage` to use `tools/mkimage` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](u-boot-ec900.bb)                                            |
+| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_FIT_SIGNATURE=y` | [in patch uboot_secure_boot.patch](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/recipes-bsp/u-boot/files/patches/uboot_its_required.patch)   |
+| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_SPL_FIT_SIGNATURE=y` | [in patch uboot_secure_boot.patch](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/recipes-bsp/u-boot/files/patches/uboot_its_required.patch)   |
+| `yocto/u-boot/boot.its` | Added `required = "conf";` | [in patch uboot_its_required.patch](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch) |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added `openssl-native` to `DEPENDS` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/recipes-bsp/u-boot/u-boot-ec900.bb)                               |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added RSA key generation in `do_compile:append` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/recipes-bsp/u-boot/u-boot-ec900.bb)                                            |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Changed `do_fitimage` to use `tools/mkimage` | [the whole file u-boot-ec900.bb from `secureboot.md` is used](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/recipes-bsp/u-boot/u-boot-ec900.bb)                                            |
 
 In [this file validation_2026_04_07.txt](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/validation_2026_04_07.txt) are:
 - the validation that the patches are correctly applied
