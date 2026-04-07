@@ -2,6 +2,7 @@ build
 build_image/.built
 .idea
 *.gz
-files/keys
+recipes-bsp/u-boot/files/keys
 EC900-*
 SECURE_BOOT.md
+secure_boot_reproduced.md

@@ -5,6 +5,7 @@ THIS_MAKEFILE_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 EC_900_SDK_NAME ?= EC900-yocto-sdk-v1.0.1
 EC_900_SDK_ARCHIVE_PATH = $(THIS_MAKEFILE_DIR)/$(EC_900_SDK_NAME).tar.gz
 EC_900_SDK_DIR = $(THIS_MAKEFILE_DIR)/$(EC_900_SDK_NAME)
+KEY_FILE_PATH = $(THIS_MAKEFILE_DIR)/recipes-bsp/u-boot/files/keys/dev.key
 YOCTO_ROOT_DIR = $(EC_900_SDK_DIR)/yocto
 OE_ENV_FILE_PATH ?= $(YOCTO_ROOT_DIR)/oe-init-build-env
 
@@ -13,6 +14,13 @@ OE_ENV_FILE_PATH ?= $(YOCTO_ROOT_DIR)/oe-init-build-env
 
 all: build-image
 
+# generate rockchip keys dev.key and dev.pubkey
+${KEY_FILE_PATH}:
+	@echo "Generating Rockchip keys dev.key and dev.pubkey..."
+	mkdir -p  $(THIS_MAKEFILE_DIR)/recipes-bsp/u-boot/files/keys/
+	openssl genpkey -algorithm RSA -out ${KEY_FILE_PATH} -pkeyopt rsa_keygen_bits:2048
+	openssl rsa -pubout -in ${KEY_FILE_PATH} -out ${KEY_FILE_PATH}.pubkey
+	@echo "Rockchip keys generated at ${KEY_FILE_PATH} and ${KEY_FILE_PATH}.pubkey"
 
 ${OE_ENV_FILE_PATH}:
 	rm -fr $(EC_900_SDK_DIR)
@@ -20,19 +28,17 @@ ${OE_ENV_FILE_PATH}:
 	@echo "Extracting EC900 SDK archive..."
 	tar -xzf $(EC_900_SDK_ARCHIVE_PATH) -C $(EC_900_SDK_DIR)
 	@echo "Linking u-boot-ec900.bb to ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb"
-	rm $(YOCTO_ROOT_DIR)/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb
-	ln -s ${THIS_MAKEFILE_DIR}/u-boot-ec900.bb ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb
-	@echo "Linking files directory to ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp/u-boot/files"
-	ln -s ${THIS_MAKEFILE_DIR}/files ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp/u-boot/files
+	rm -fr $(YOCTO_ROOT_DIR)/meta-inhand/recipes-bsp
+	ln -s ${THIS_MAKEFILE_DIR}/recipes-bsp ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp
 	@echo "EC900 SDK extracted to $(EC_900_SDK_DIR)"
 
 
-build-image: ${OE_ENV_FILE_PATH}
+build-image: ${OE_ENV_FILE_PATH} ${KEY_FILE_PATH}
 	docker run --volume ${THIS_MAKEFILE_DIR}:${THIS_MAKEFILE_DIR} \
 			--workdir ${YOCTO_ROOT_DIR} \
 			--rm \
 			-it crops/poky:latest \
-			bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c cleanall && bitbake -v -D u-boot-ec900"
+			bash -c "source ${OE_ENV_FILE_PATH} && bitbake linux-ec900 -c cleanall && bitbake -v -D linux-ec900"
 
 # bitbake ec900-image -c do_updateimg
 # bitbake u-boot-ec900 -c compile -f

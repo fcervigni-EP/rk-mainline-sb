@@ -1,0 +1,12 @@
+diff --git a/boot.its b/boot.its
+index 01e19bb..0596e63 100644
+--- a/boot.its
++++ b/boot.its
+@@ -60,6 +60,7 @@
+                 algo = "sha256,rsa2048";
+                 padding = "pss";
+                 key-name-hint = "dev";
++                required = "conf";
+                 sign-images = "fdt", "kernel", "multi";
+             };
+         };
