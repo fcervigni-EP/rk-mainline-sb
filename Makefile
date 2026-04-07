@@ -5,22 +5,12 @@ THIS_MAKEFILE_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 EC_900_SDK_NAME ?= EC900-yocto-sdk-v1.0.1
 EC_900_SDK_ARCHIVE_PATH = $(THIS_MAKEFILE_DIR)/$(EC_900_SDK_NAME).tar.gz
 EC_900_SDK_DIR = $(THIS_MAKEFILE_DIR)/$(EC_900_SDK_NAME)
-KEY_FILE_PATH = $(THIS_MAKEFILE_DIR)/recipes-bsp/u-boot/files/keys/dev.key
 YOCTO_ROOT_DIR = $(EC_900_SDK_DIR)/yocto
 OE_ENV_FILE_PATH ?= $(YOCTO_ROOT_DIR)/oe-init-build-env
-
 
 .PHONY: all build-image clean
 
 all: build-image
-
-# generate rockchip keys dev.key and dev.pubkey
-${KEY_FILE_PATH}:
-	@echo "Generating Rockchip keys dev.key and dev.pubkey..."
-	mkdir -p  $(THIS_MAKEFILE_DIR)/recipes-bsp/u-boot/files/keys/
-	openssl genpkey -algorithm RSA -out ${KEY_FILE_PATH} -pkeyopt rsa_keygen_bits:2048
-	openssl rsa -pubout -in ${KEY_FILE_PATH} -out ${KEY_FILE_PATH}.pubkey
-	@echo "Rockchip keys generated at ${KEY_FILE_PATH} and ${KEY_FILE_PATH}.pubkey"
 
 ${OE_ENV_FILE_PATH}:
 	rm -fr $(EC_900_SDK_DIR)
@@ -33,12 +23,12 @@ ${OE_ENV_FILE_PATH}:
 	@echo "EC900 SDK extracted to $(EC_900_SDK_DIR)"
 
 
-build-image: ${OE_ENV_FILE_PATH} ${KEY_FILE_PATH}
+build-image: ${OE_ENV_FILE_PATH}
 	docker run --volume ${THIS_MAKEFILE_DIR}:${THIS_MAKEFILE_DIR} \
 			--workdir ${YOCTO_ROOT_DIR} \
 			--rm \
 			-it crops/poky:latest \
-			bash -c "source ${OE_ENV_FILE_PATH} && bitbake linux-ec900 -c cleanall && bitbake -v -D linux-ec900"
+			bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c cleansstate && bitbake -v -D u-boot-ec900"
 
 # bitbake ec900-image -c do_updateimg
 # bitbake u-boot-ec900 -c compile -f

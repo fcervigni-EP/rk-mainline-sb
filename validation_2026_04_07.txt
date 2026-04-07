@@ -1,0 +1,140 @@
+
+########## Checking if uboot_secure_boot.patch worked ....
+#
+#
+❯ find EC900-yocto-sdk-v1.0.1/ -name rk3568_defconfig
+EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/build/configs/rk3568_defconfig
+EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/git/configs/rk3568_defconfig
+EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/git/.pc/uboot_secure_boot.patch/configs/rk3568_defconfig
+EC900-yocto-sdk-v1.0.1/yocto/u-boot/configs/rk3568_defconfig
+
+❯ tail EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/git/configs/rk3568_defconfig
+CONFIG_AVB_LIBAVB=y
+CONFIG_AVB_LIBAVB_AB=y
+CONFIG_AVB_LIBAVB_ATX=y
+CONFIG_AVB_LIBAVB_USER=y
+CONFIG_RK_AVB_LIBAVB_USER=y
+CONFIG_OPTEE_CLIENT=y
+CONFIG_OPTEE_V2=y
+CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION=y
+CONFIG_FIT_SIGNATURE=y                       <------------------------ YES, OK
+CONFIG_SPL_FIT_SIGNATURE=y                   <------------------------ YES, OK
+#
+#
+######################### YES. see arrows above
+
+
+
+
+
+########## Checking if uboot_its_required.patch worked ....
+#
+#
+❯ find EC900-yocto-sdk-v1.0.1/ -name boot.its
+EC900-yocto-sdk-v1.0.1/yocto/kernel/boot.its
+EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/armv8a-poky-linux/linux-libc-headers/5.10-custom-r0/git/boot.its
+EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/git/boot.its
+EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/git/.pc/uboot_its_required.patch/boot.its
+EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work-shared/ec942/kernel-source/boot.its
+EC900-yocto-sdk-v1.0.1/yocto/u-boot/boot.its
+
+❯ tail EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/git/boot.its
+            signature {
+                algo = "sha256,rsa2048";
+                padding = "pss";
+                key-name-hint = "dev";
+                required = "conf";                          <------------------------ YES, OK
+                sign-images = "fdt", "kernel", "multi";
+            };
+        };
+    };
+};
+#
+#
+######################### YES. see arrows above
+
+
+
+
+
+
+########## Checking if CONFIG_FIT_SIGNATURE and CONFIG_SPL_FIT_SIGNATURE are applied ....
+#
+#
+❯ grep "FIT_SIGNATURE" \
+  yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/build/.config
+CONFIG_FIT_SIGNATURE=y
+CONFIG_SPL_FIT_SIGNATURE=y
+#
+#
+######################### YES.
+
+
+
+########## Checking if CONFIG_FIT_SIGNATURE and CONFIG_SPL_FIT_SIGNATURE are applied ....
+#
+#
+❯ BDIR=yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/build
+${BDIR}/tools/mkimage --help 2>&1 | grep -E "sign|key|Signing"
+Signing / verified boot options: [-E] [-k keydir] [-K dtb] [ -c <comment>] [-p addr] [-r] [-N engine]
+          -k => set directory containing private keys
+          -K => write public keys to this .dtb file
+          -c => add comment in signature node
+          -F => re-sign existing FIT image
+          -r => mark keys used as 'required' in dtb
+          -N => engine to use for signing (pkcs11)
+#
+#
+######################### YES., -k, -K and -r available
+
+
+
+
+########## Checking if keys are available ....
+#
+#
+❯ BDIR=yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/build
+ls -la ${BDIR}/keys/
+total 20
+drwxr-xr-x  2 fra fra 4096 Apr  7 14:14 .
+drwxr-xr-x 24 fra fra 4096 Apr  7 14:14 ..
+-rw-r--r--  1 fra fra 1099 Apr  7 14:14 dev.crt
+-rw-------  1 fra fra 1704 Apr  7 14:14 dev.key
+-rw-r--r--  1 fra fra  451 Apr  7 14:14 dev.pubkey
+#
+#
+######################### YES., available
+
+
+
+########## Checking if keys are available ....
+#
+#
+❯ BDIR=yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/build
+❯ fdtget -l ${BDIR}/u-boot.dtb /signature
+key-dev
+
+❯ fdtget -t s ${BDIR}/u-boot.dtb /signature/key-dev algo
+                                  <------------------------------------------ NO. It should not be empty.
+
+❯ fdtget -t s ${BDIR}/u-boot.dtb /signature/key-dev required
+conf
+
+❯ fdtget -t u ${BDIR}/u-boot.dtb /signature/key-dev rsa,num-bits
+2048
+
+❯ DEPLOY=yocto/build/tmp/deploy/images/ec942
+❯ fdtdump ${DEPLOY}/boot.img 2>&1 | grep -A 15 "signature {"
+            signature {
+                algo = "sha256,rsa2048";
+                padding = "pss";
+                key-name-hint = "dev"; <------------------------------------------ NO. Here is missing the signature.
+                sign-images = "fdt", "kernel", "multi";
+            };
+        };
+    };
+};
+#
+#
+######################### NO !!!!!!! Not the same as the .mf file
+
