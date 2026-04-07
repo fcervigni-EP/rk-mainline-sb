@@ -5,8 +5,6 @@
 ```shell
 # copy here the SDK .tar.gz
 cp <your_location>/EC900-yocto-sdk-v1.0.1.tar.gz .
-# copy your keys folder into the files/ folder. it is a secret, do not commit it.
-cd -r <your_location>/keys/ files/
 
 # build
 make
@@ -115,4 +113,19 @@ b) How can we improve [our recipe](https://github.com/fcervigni-EP/rk-mainline-s
    # Image is uboot.img
    # the image did not support to sign
 ```
+
+# Secure Boot blockage of 07.04.2026
+
+We have received file `secureboot.md` on 04/07/2026.
+
+The suggestions were the following:
+
+| File | Change | Where done                                                                                      |
+|------|--------|-------------------------------------------------------------------------------------------------|
+| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_FIT_SIGNATURE=y` | [this patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch) |
+| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_SPL_FIT_SIGNATURE=y` | [this patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch) |
+| `yocto/u-boot/boot.its` | Added `required = "conf";` | [this patch](recipes-bsp/u-boot/files/patches/uboot_its_required.patch) |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added `openssl-native` to `DEPENDS` | [the whole sent file used here](u-boot-ec900.bb) |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added RSA key generation in `do_compile:append` | [this patch](u-boot-ec900.bb) |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Changed `do_fitimage` to use `tools/mkimage` | [this patch](u-boot-ec900.bb) |
 
