@@ -28,7 +28,7 @@ build-image: ${OE_ENV_FILE_PATH}
 			--workdir ${YOCTO_ROOT_DIR} \
 			--rm \
 			-it crops/poky:latest \
-			bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c cleansstate && bitbake -v -D u-boot-ec900"
+			bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c cleansstate && bitbake u-boot-ec900"
 
 # bitbake ec900-image -c do_updateimg
 # bitbake u-boot-ec900 -c compile -f

@@ -1,5 +1,7 @@
 # rk-mainline-sb
 
+- [Build/clean](#buildclean)
+
 ###### Build/clean
 
 ```shell
@@ -118,14 +120,33 @@ b) How can we improve [our recipe](https://github.com/fcervigni-EP/rk-mainline-s
 
 We have received file `secureboot.md` on 04/07/2026.
 
-The suggestions were the following:
+Here is a summary of the suggestions and how they were applied.
 
-| File | Change | Where done                                                                                      |
-|------|--------|-------------------------------------------------------------------------------------------------|
-| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_FIT_SIGNATURE=y` | [this patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch) |
-| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_SPL_FIT_SIGNATURE=y` | [this patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch) |
+| File | Change | Where done                                                              |
+|------|--------|-------------------------------------------------------------------------|
+| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_FIT_SIGNATURE=y` | [this patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch)  |
+| `yocto/u-boot/configs/rk3568_defconfig` | Added `CONFIG_SPL_FIT_SIGNATURE=y` | [this patch](recipes-bsp/u-boot/files/patches/uboot_secure_boot.patch)  |
 | `yocto/u-boot/boot.its` | Added `required = "conf";` | [this patch](recipes-bsp/u-boot/files/patches/uboot_its_required.patch) |
-| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added `openssl-native` to `DEPENDS` | [the whole sent file used here](u-boot-ec900.bb) |
-| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added RSA key generation in `do_compile:append` | [this patch](u-boot-ec900.bb) |
-| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Changed `do_fitimage` to use `tools/mkimage` | [this patch](u-boot-ec900.bb) |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added `openssl-native` to `DEPENDS` | [the whole sent file is used here](u-boot-ec900.bb)                     |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Added RSA key generation in `do_compile:append` | [the whole sent file is used here](u-boot-ec900.bb)                     |
+| `yocto/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb` | Changed `do_fitimage` to use `tools/mkimage` | [the whole sent file is used here](u-boot-ec900.bb)                     |
 
+In [this file](https://github.com/fcervigni-EP/rk-mainline-sb/blob/main/validation_2026_04_07.txt) are:
+- the validation that the patches are correctly applied
+- the validation checks from the `secureboot.md` that we have received.
+
+The current issues is:
+```
+Log data follows
+| DEBUG: Executing shell function do_fitimage
+| NOTE: u-boot-ec900: signing boot.img with tools/mkimage (inline FIT, RSA-2048)...
+| tools/mkimage Can't add hashes to FIT blob: -5
+| Failed to add verification data for 'signature' signature node in 'conf' image node
+| WARNING: /home/fra/work/rk-mainline-sb/EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/temp/run.do_fitimage.13592:192 exit 255 from 'tools/mkimage -f "$TMP_ITS" -k keys/ -K u-boot.dtb -r "$TARGET_IMG"'
+| WARNING: Backtrace (BB generated script):
+|       #1: do_fitimage, /home/fra/work/rk-mainline-sb/EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/temp/run.do_fitimage.13592, line 192
+|       #2: main, /home/fra/work/rk-mainline-sb/EC900-yocto-sdk-v1.0.1/yocto/build/tmp/work/ec942-poky-linux/u-boot-ec900/1_2017.09-r0/temp/run.do_fitimage.13592, line 216
+ERROR: Task (/home/fra/work/rk-mainline-sb/EC900-yocto-sdk-v1.0.1/yocto/build/../meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb:do_fitimage) failed with exit code '1'
+```
+
+To reproduce: instructions are in the sectiion **Build/clean** of this README.md, but you need to use the `u-boot-ec900.bb` file that is in the repository, which is the one with the changes for secure boot.
