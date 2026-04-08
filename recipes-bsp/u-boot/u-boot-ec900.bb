@@ -9,9 +9,7 @@ DEPENDS += " linux-ec900 bc-native dtc-native"
 PV = "2017.09"
 
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
-SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
-    file://patches/uboot_secure_boot.patch \
-    file://patches/uboot_its_required.patch"
+SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master;"
 SRCREV = "${AUTOREV}"
 
 # Generate Rockchip style loader binaries
@@ -107,15 +105,8 @@ do_fitimage() {
     RESOURCE_IMG=${DEPLOY_DIR_IMAGE}/resource.img
 
     if [ ! -f "$ITS" ]; then
-        bbfatal "${PN}: boot.its not found at $ITS"
-    fi
-
-    if [ ! -f "u-boot.dtb" ]; then
-        bbfatal "${PN}: u-boot.dtb not found in ${B} — was do_compile successful?"
-    fi
-
-    if [ ! -f "keys/dev.key" ] || [ ! -f "keys/dev.crt" ]; then
-        bbfatal "${PN}: signing keys not found in ${B}/keys/ — was do_compile:append successful?"
+        echo "$ITS not exists!"
+        exit 1
     fi
 
     TMP_ITS=$(mktemp)
@@ -126,21 +117,11 @@ do_fitimage() {
         -e "s~@RAMDISK_IMG@~$(realpath -q "$RAMDISK_IMG")~" \
         -e "s~@RESOURCE_IMG@~$(realpath -q "$RESOURCE_IMG")~" "$TMP_ITS"
 
-    bbnote "${PN}: signing boot.img with tools/mkimage (inline FIT, RSA-2048)..."
-
     # Use U-Boot compiled mkimage (supports FIT signing) to sign boot.img.
-    # -k keys/    : directory containing dev.key and dev.crt
-    # -K u-boot.dtb : embed RSA public key into u-boot.dtb so U-Boot can
-    #                 verify boot.img at runtime
-    # -r          : mark configuration as required (boot fails if sig invalid)
-    #
-    # NOTE: Do NOT pass -E / -p here.  The -E flag stores image data outside
-    # the FDT blob (external-data format).  When mkimage then tries to sign,
-    # it must hash those bytes, but with external layout they are no longer
-    # addressable inside the in-memory FDT → fit_add_verification_data()
-    # returns -EIO (-5) and prints "Can't add hashes to FIT blob".
-    # Standard inline FIT is perfectly valid for U-Boot verified boot.
-    tools/mkimage -f "$TMP_ITS" -k keys/ -K u-boot.dtb -r "$TARGET_IMG"
+    # -k keys/       : directory containing dev.key and dev.crt
+    # -K u-boot.dtb  : embed public key into u-boot.dtb for U-Boot runtime verification
+    # -r             : mark configuration as required (boot fails if sig invalid)
+    tools/mkimage -f "$TMP_ITS" -k keys/ -K u-boot.dtb -E -p 0x800 -r "$TARGET_IMG"
 
     rm -f "$TMP_ITS"
 }
