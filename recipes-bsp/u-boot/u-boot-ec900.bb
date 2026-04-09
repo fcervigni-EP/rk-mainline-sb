@@ -119,6 +119,8 @@ do_fitimage() {
         -e "s~@RAMDISK_IMG@~$(realpath -q "$RAMDISK_IMG")~" \
         -e "s~@RESOURCE_IMG@~$(realpath -q "$RESOURCE_IMG")~" "$TMP_ITS"
 
+    fdtput -r u-boot.dtb /signature/key-dev/hash@c 2>/dev/null || true
+    fdtput -r u-boot.dtb /signature/key-dev/hash@np 2>/dev/null || true
     # Use U-Boot compiled mkimage (supports FIT signing) to sign boot.img.
     # -k keys/       : directory containing dev.key and dev.crt
     # -K u-boot.dtb  : embed public key into u-boot.dtb for U-Boot runtime verification
