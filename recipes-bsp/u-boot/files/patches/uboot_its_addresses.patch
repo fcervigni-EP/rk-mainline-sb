@@ -1,0 +1,24 @@
+diff --git a/boot.its b/boot.its
+index 01e19bb..cace262 100644
+--- a/boot.its
++++ b/boot.its
+@@ -14,7 +14,7 @@
+             type = "flat_dt";
+             arch = "arm64";
+             compression = "none";
+-            load = <0xffffff00>;
++            load = <0x08300000>;
+ 
+             hash {
+                 algo = "sha256";
+@@ -27,8 +27,8 @@
+             arch = "arm64";
+             os = "linux";
+             compression = "none";
+-            entry = <0xffffff01>;
+-            load = <0xffffff01>;
++            entry = <0x00200000>;
++            load = <0x00200000>;
+ 
+             hash {
+                 algo = "sha256";

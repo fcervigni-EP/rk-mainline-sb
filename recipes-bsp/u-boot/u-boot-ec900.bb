@@ -11,6 +11,7 @@ PV = "2017.09"
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
 SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
     file://patches/uboot_secure_boot.patch \
+    file://patches/uboot_its_addresses.patch \
     file://patches/uboot_its_required.patch"
 SRCREV = "${AUTOREV}"
 
@@ -121,11 +122,8 @@ do_fitimage() {
 
     fdtput -r u-boot.dtb /signature/key-dev/hash@c 2>/dev/null || true
     fdtput -r u-boot.dtb /signature/key-dev/hash@np 2>/dev/null || true
-    # Use U-Boot compiled mkimage (supports FIT signing) to sign boot.img.
-    # -k keys/       : directory containing dev.key and dev.crt
-    # -K u-boot.dtb  : embed public key into u-boot.dtb for U-Boot runtime verification
-    # -r             : mark configuration as required (boot fails if sig invalid)
-    tools/mkimage -f "$TMP_ITS" -k keys/ -K u-boot.dtb -E -p 0x800 -r "$TARGET_IMG"
+    # do not re-sign the image, as the public key is already embedded in u-boot.dtb and the private key is used by make.sh to sign uboot.img
+    tools/mkimage -f "$TMP_ITS" -k keys/ -E -p 0x800 "$TARGET_IMG"
 
     rm -f "$TMP_ITS"
 }
