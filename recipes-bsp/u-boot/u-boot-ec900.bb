@@ -12,6 +12,8 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
 SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
     file://patches/uboot_secure_boot.patch \
     file://patches/uboot_its_addresses.patch \
+    file://patches/uboot_no_autoboot.patch \
+    file://patches/uboot_disable_android_boot.patch \
     file://patches/uboot_its_required.patch"
 SRCREV = "${AUTOREV}"
 

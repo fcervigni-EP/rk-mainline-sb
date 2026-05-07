@@ -1,0 +1,13 @@
+diff --git a/rkbin/RKBOOT/RK3568MINIALL.ini b/rkbin/RKBOOT/RK3568MINIALL.ini
+--- a/rkbin/RKBOOT/RK3568MINIALL.ini
++++ b/rkbin/RKBOOT/RK3568MINIALL.ini
+@@ -15,7 +15,7 @@ NUM=2
+ LOADER1=FlashData
+ LOADER2=FlashBoot
+ FlashData=bin/rk35/rk3568_ddr_1560MHz_v1.21.bin
+-FlashBoot=bin/rk35/rk356x_spl_v1.13.bin
++FlashBoot=../../spl/u-boot-spl.bin
+ [OUTPUT]
+ PATH=rk356x_spl_loader_v1.21.113.bin
+ [SYSTEM]
+
