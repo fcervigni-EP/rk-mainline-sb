@@ -30,6 +30,13 @@ ${OE_ENV_FILE_PATH}:
 	@echo "EC900 SDK extracted to $(EC_900_SDK_DIR)"
 
 
+build-u-boot: ${OE_ENV_FILE_PATH}
+	docker run --volume ${THIS_MAKEFILE_DIR}:${THIS_MAKEFILE_DIR} \
+			--workdir ${YOCTO_ROOT_DIR} \
+			--rm \
+			-it crops/poky:latest \
+			bash -c "source ${OE_ENV_FILE_PATH} && bitbake u-boot-ec900 -c cleansstate && bitbake u-boot-ec900 -c clean && bitbake -v -D u-boot-ec900"
+
 build-image: ${OE_ENV_FILE_PATH}
 	docker run --volume ${THIS_MAKEFILE_DIR}:${THIS_MAKEFILE_DIR} \
 			--workdir ${YOCTO_ROOT_DIR} \
