@@ -1,0 +1,11 @@
+# NAME		Relative path
+package-file	package-file
+bootloader	loader.bin
+parameter	parameter.txt
+uboot		uboot.img
+misc		misc.img
+boot_a		boot.img
+boot_b		boot.img
+rootfs_a	rootfs.img
+rootfs_b	rootfs.img
+oem		oem.img

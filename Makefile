@@ -18,9 +18,15 @@ ${OE_ENV_FILE_PATH}:
 	mkdir -p $(EC_900_SDK_DIR)
 	@echo "Extracting EC900 SDK archive..."
 	tar -xzf $(EC_900_SDK_ARCHIVE_PATH) -C $(EC_900_SDK_DIR)
-	@echo "Linking u-boot-ec900.bb to ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb"
+	@echo "Linking ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp to ${THIS_MAKEFILE_DIR}/recipes-bsp"
 	rm -fr $(YOCTO_ROOT_DIR)/meta-inhand/recipes-bsp
 	ln -s ${THIS_MAKEFILE_DIR}/recipes-bsp ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp
+	@echo "Linking ${YOCTO_ROOT_DIR}/meta-inhand/recipes-core to ${THIS_MAKEFILE_DIR}/recipes-core"
+	rm -fr $(YOCTO_ROOT_DIR)/meta-inhand/recipes-core
+	ln -s ${THIS_MAKEFILE_DIR}/recipes-core ${YOCTO_ROOT_DIR}/meta-inhand/recipes-core
+	@echo "Linking package-file to ${THIS_MAKEFILE_DIR}/package-file"
+	rm -fr ${YOCTO_ROOT_DIR}/tools/package-file
+	ln -s ${THIS_MAKEFILE_DIR}/package-file ${YOCTO_ROOT_DIR}/tools/package-file
 	@echo "EC900 SDK extracted to $(EC_900_SDK_DIR)"
 
 
