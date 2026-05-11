@@ -13,6 +13,7 @@ SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
     file://patches/uboot_secure_boot.patch \
     file://patches/uboot_its_addresses.patch \
     file://patches/uboot-mender-boot.patch \
+    file://patches/uboot-no-disabling-cli.patch \
     file://patches/uboot_load_script.patch \
     file://patches/uboot_its_required.patch"
 SRCREV = "${AUTOREV}"

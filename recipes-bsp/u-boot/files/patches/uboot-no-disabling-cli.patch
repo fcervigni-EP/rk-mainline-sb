@@ -1,0 +1,11 @@
+diff --git a/Kconfig b/Kconfig
+--- a/Kconfig	(revision 02df6b91110931b588f3585282fad97d9495bc48)
++++ b/Kconfig	(date 1778501473109)
+@@ -219,7 +219,6 @@
+ 	bool "Enable signature verification of FIT uImages"
+ 	depends on DM
+ 	select RSA
+-	select CONSOLE_DISABLE_CLI
+ 	help
+ 	  This option enables signature verification of FIT uImages,
+ 	  using a hash signed and verified using RSA. If
