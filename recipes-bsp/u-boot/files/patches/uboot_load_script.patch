@@ -1,6 +1,7 @@
 diff --git a/include/configs/evb_rk3568.h b/include/configs/evb_rk3568.h
---- a/include/configs/evb_rk3568.h	(revision 02df6b91110931b588f3585282fad97d9495bc48)
-+++ b/include/configs/evb_rk3568.h	(date 1778488110208)
+index f7318c3..9fd269b 100644
+--- a/include/configs/evb_rk3568.h
++++ b/include/configs/evb_rk3568.h
 @@ -20,7 +20,20 @@
  #define CONFIG_SYS_MMC_ENV_DEV		0
  
@@ -14,11 +15,11 @@ diff --git a/include/configs/evb_rk3568.h b/include/configs/evb_rk3568.h
 + * (boot_fit) if no boot.scr is found or its verification fails.
 + */
 +#define CONFIG_BOOTCOMMAND						\
-+	"setenv devtype mmc; setenv devnum 0; "			\
-+	"setenv prefix /boot/; "				\
-+	"for distro_bootpart in 6 7; do "			\
-+	"run scan_dev_for_scripts; "			\
-+	"done; "						\
++	"setenv devtype mmc; setenv devnum 0; "				\
++	"setenv prefix /boot/; "					\
++	"for distro_bootpart in 6 7; do "				\
++	"run scan_dev_for_scripts; "					\
++	"done; "							\
 +	RKIMG_BOOTCOMMAND
  
  #ifdef CONFIG_USB_FUNCTION_DFU
