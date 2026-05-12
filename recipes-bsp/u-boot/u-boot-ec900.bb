@@ -11,6 +11,8 @@ PV = "2017.09"
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
 SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
     file://patches/uboot_secure_boot.patch \
+    file://patches/uboot-no-disabling-cli.patch \
+    file://patches/uboot-boot-delay.patch \
     file://patches/uboot_its_addresses.patch \
     file://patches/uboot_its_required.patch"
 SRCREV = "${AUTOREV}"
