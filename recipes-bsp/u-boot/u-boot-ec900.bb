@@ -28,6 +28,25 @@ DEPENDS:append = " ${PYTHON_PN}-native"
 # Needed for packing BSP u-boot
 DEPENDS:append = " coreutils-native ${PYTHON_PN}-pyelftools-native util-linux-native openssl-native"
 
+# ---------------------------------------------------------------------------
+# Signing key injection
+# ---------------------------------------------------------------------------
+# Set these variables (base64-encoded PEM) to use a persistent key pair
+# instead of a randomly-generated one.  In local.conf:
+#
+#   UBOOT_SIGNING_KEY_B64  = "<base64 of dev.key PEM>"
+#   UBOOT_SIGNING_CERT_B64 = "<base64 of dev.crt PEM>"
+#
+# Or export them as shell env vars and add to BB_ENV_PASSTHROUGH_ADDITIONS:
+#
+#   export UBOOT_SIGNING_KEY_B64=$(base64 -w0 keys/dev.key)
+#   export UBOOT_SIGNING_CERT_B64=$(base64 -w0 keys/dev.crt)
+#   BB_ENV_PASSTHROUGH_ADDITIONS += "UBOOT_SIGNING_KEY_B64 UBOOT_SIGNING_CERT_B64"
+#
+# If either variable is empty the recipe auto-generates a throwaway key pair.
+UBOOT_SIGNING_KEY_B64  ?= ""
+UBOOT_SIGNING_CERT_B64 ?= ""
+
 do_configure:prepend() {
 	# Make sure we use /usr/bin/env ${PYTHON_PN} for scripts
 	for s in `grep -rIl python ${S}`; do
@@ -71,15 +90,24 @@ do_compile:append() {
 			cp -rT ${S}/${d} ${d}
 		done
 
-		# Generate RSA signing keys if not already present
-		if [ ! -f keys/dev.key ]; then
-			mkdir -p keys
+		# Provision RSA signing keys ------------------------------------------
+		# Priority:
+		#   1. UBOOT_SIGNING_KEY_B64 / UBOOT_SIGNING_CERT_B64 BitBake vars
+		#      (set in local.conf or passed via BB_ENV_PASSTHROUGH_ADDITIONS)
+		#   2. Auto-generate a throwaway key pair (dev/test builds only)
+		mkdir -p keys
+		if [ -n "${UBOOT_SIGNING_KEY_B64}" ] && [ -n "${UBOOT_SIGNING_CERT_B64}" ]; then
+			bbnote "${PN}: Using injected signing keys from UBOOT_SIGNING_KEY_B64 / UBOOT_SIGNING_CERT_B64"
+			printf '%s' "${UBOOT_SIGNING_KEY_B64}"  | base64 -d > keys/dev.key
+			printf '%s' "${UBOOT_SIGNING_CERT_B64}" | base64 -d > keys/dev.crt
+			chmod 600 keys/dev.key
+		elif [ ! -f keys/dev.key ]; then
+			bbnote "${PN}: No signing keys provided — generating ephemeral RSA-2048 key pair (NOT suitable for production)"
 			openssl genrsa -out keys/dev.key 2048
 			openssl req -batch -new -x509 -key keys/dev.key -out keys/dev.crt \
 				-days 7300 -subj "/CN=dev/"
-			openssl rsa -in keys/dev.key -pubout -out keys/dev.pubkey
-			bbnote "${PN}: Generated RSA-2048 signing keys in ${B}/keys/"
 		fi
+		openssl rsa -in keys/dev.key -pubout -out keys/dev.pubkey
 
 		# Pack rockchip loader images.
 		# With CONFIG_FIT_SIGNATURE=y, make.sh automatically:
