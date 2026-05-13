@@ -1,0 +1,86 @@
+From c849c91480e063e5d31524bc8a367fea2bc125b8 Mon Sep 17 00:00:00 2001
+From: Francesco Cervigni <francesco.cervigni@ext-energy-pool.eu>
+Date: Thu, 7 May 2026 17:51:41 +0200
+Subject: [PATCH 1/1] mender boot
+
+---
+diff --git a/boot-scr.its b/boot-scr.its
+new file mode 100644
+index 0000000..17a856a
+--- /dev/null
++++ b/boot-scr.its
+@@ -0,0 +1,36 @@
++/dts-v1/;
++
++/ {
++    description = "EC942 signed boot.scr (Mender / distro_bootcmd compatible)";
++    #address-cells = <1>;
++
++    images {
++        bootscr {
++            description = "U-Boot boot script";
++            data = /incbin/("@BOOTSCR_TXT@");
++            type = "script";
++            arch = "arm64";
++            compression = "none";
++            hash {
++                algo = "sha256";
++            };
++        };
++    };
++
++    configurations {
++        default = "conf";
++
++        conf {
++            description = "Default boot script configuration";
++            script = "bootscr";
++
++            signature {
++                algo = "sha256,rsa2048";
++                padding = "pss";
++                key-name-hint = "dev";
++                required = "conf";
++                sign-images = "script";
++            };
++        };
++    };
++};
+diff --git a/boot-scr.txt b/boot-scr.txt
+new file mode 100644
+index 0000000..99b0b9d
+--- /dev/null
++++ b/boot-scr.txt
+@@ -0,0 +1,29 @@
++# EC942 boot.scr — Mender-compatible reference script (signed FIT payload)
++#
++# When CONFIG_FIT_SIGNATURE=y, U-Boot's `source` command forces signature
++# verification, so this body is only executed if the wrapping FIT image
++# is signed by the same dev.key embedded in u-boot.dtb.
++#
++# Real Mender deployments will replace this body with the script that
++# Mender's u-boot integration emits (it sets `mender_boot_part`,
++# `mender_boot_part_hex`, etc., reads them on boot, and bootms accordingly).
++# This reference body proves the chain end-to-end:
++#   1. distro_bootcmd scanned the rootfs partition
++#   2. /boot/boot.scr was found
++#   3. signature was verified by `source`
++#   4. the script body actually ran on the U-Boot console
++# It then delegates to boot_fit so the device still completes boot.
++
++echo "===================================================="
++echo "  EC942 boot.scr verified and executing"
++echo "===================================================="
++echo "  devtype          = ${devtype}"
++echo "  devnum           = ${devnum}"
++echo "  distro_bootpart  = ${distro_bootpart}"
++echo "  android_slot_suffix = ${android_slot_suffix}"
++echo "  scriptaddr       = ${scriptaddr}"
++echo "----------------------------------------------------"
++echo "  Delegating to boot_fit (FIT-signed kernel chain)"
++echo "===================================================="
++
++boot_fit
+-- 
+2.43.0
+

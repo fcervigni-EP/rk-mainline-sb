@@ -13,6 +13,7 @@ SRC_URI = "git://${TOPDIR}/../u-boot;protocol=file;branch=master; \
     file://patches/uboot_secure_boot.patch \
     file://patches/uboot-no-disabling-cli.patch \
     file://patches/uboot-boot-delay.patch \
+    file://patches/uboot-mender-boot.patch \
     file://patches/uboot_its_addresses.patch \
     file://patches/uboot_its_required.patch"
 SRCREV = "${AUTOREV}"
@@ -131,6 +132,27 @@ do_fitimage() {
     tools/mkimage -f "$TMP_ITS" -k keys/ -E -p 0x800 "$TARGET_IMG"
 
     rm -f "$TMP_ITS"
+
+
+    # Build and sign script
+	ITS="${S}/boot-scr.its"
+	BOOTSCR_TXT="${S}/boot-scr.txt"
+	TARGET="${DEPLOY_DIR_IMAGE}/boot.scr"
+
+	TMP_ITS=$(mktemp)
+	cp "$ITS" "$TMP_ITS"
+	sed -i -e "s~@BOOTSCR_TXT@~$(realpath -q "$BOOTSCR_TXT")~" "$TMP_ITS"
+
+	# Use the freshly compiled mkimage so PSS/RSA support matches u-boot's
+	# own verifier.  -k keys/ picks up dev.key generated in do_compile.
+	# No -K (do not modify u-boot.dtb here, same reason as do_fitimage).
+	tools/mkimage -f "$TMP_ITS" -k keys/ -E -p 0x800 "$TARGET"
+
+	rm -f "$TMP_ITS"
+
+	# Versioned copy + symlink, mirroring loader.bin / boot.img layout.
+	install "$TARGET" "${DEPLOY_DIR_IMAGE}/boot.scr-${PV}"
+	ln -sf "boot.scr-${PV}" "${DEPLOY_DIR_IMAGE}/boot.scr"
 }
 do_fitimage[nostamp] = "1"
 do_fitimage[depends] += "linux-ec900:do_deploy"
