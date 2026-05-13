@@ -4,5 +4,6 @@ build_image/.built
 *.gz
 recipes-bsp/u-boot/files/keys
 EC900-*
+signing.env
 SECURE_BOOT.md
 secure_boot_reproduced.md

@@ -70,15 +70,18 @@ do_compile:append() {
             cp -rT ${S}/${d} ${d}
         done
 
-        # Generate RSA signing keys if not already present
-        if [ ! -f keys/dev.key ]; then
-            mkdir -p keys
-            openssl genrsa -out keys/dev.key 2048
-            openssl req -batch -new -x509 -key keys/dev.key -out keys/dev.crt \
-                -days 7300 -subj "/CN=dev/"
-            openssl rsa -in keys/dev.key -pubout -out keys/dev.pubkey
-            bbnote "${PN}: Generated RSA-2048 signing keys in ${B}/keys/"
+        mkdir -p keys
+        if [ -n "${EPOS_SIGNING_KEY_B64}" ] && [ -n "${EPOS_SIGNING_CERT_B64}" ]; then
+            bbnote "${PN}: Using injected signing keys from EPOS_SIGNING_KEY_B64 / EPOS_SIGNING_CERT_B64"
+            printf '%s' "${EPOS_SIGNING_KEY_B64}"  | base64 -d > keys/dev.key
+            printf '%s' "${EPOS_SIGNING_CERT_B64}" | base64 -d > keys/dev.crt
+            chmod 600 keys/dev.key
+        else
+            bbfatal "${PN}: EPOS_SIGNING_KEY_B64 and EPOS_SIGNING_CERT_B64 must be set"
         fi
+
+        openssl rsa -in keys/dev.key -pubout -out keys/dev.pubkey
+
 
         # Pack rockchip loader images (with FIT_SIGNATURE enabled,
         # make.sh automatically signs uboot.img and embeds the public key

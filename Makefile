@@ -21,6 +21,10 @@ ${OE_ENV_FILE_PATH}:
 	@echo "Linking u-boot-ec900.bb to ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp/u-boot/u-boot-ec900.bb"
 	rm -fr $(YOCTO_ROOT_DIR)/meta-inhand/recipes-bsp
 	ln -s ${THIS_MAKEFILE_DIR}/recipes-bsp ${YOCTO_ROOT_DIR}/meta-inhand/recipes-bsp
+	source signing.env
+	echo "EPOS_SIGNING_KEY_B64 = \"${EPOS_SIGNING_KEY_B64}\"" > ${YOCTO_ROOT_DIR}/build/conf/signing.conf
+	echo "EPOS_SIGNING_CERT_B64 = \"${EPOS_SIGNING_CERT_B64}\"" >> ${YOCTO_ROOT_DIR}/build/conf/signing.conf
+	echo "signing.conf" >> ${YOCTO_ROOT_DIR}/build/conf/local.conf
 	@echo "EC900 SDK extracted to $(EC_900_SDK_DIR)"
 
 
